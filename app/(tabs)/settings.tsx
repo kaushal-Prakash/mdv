@@ -6,6 +6,8 @@ import {
   SafeAreaView,
   Switch,
   ScrollView,
+  TouchableOpacity,
+  Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAppStore } from "../../store/appStore";
@@ -54,7 +56,10 @@ const SettingItem = ({
 export default function SettingsScreen() {
   const { settings, toggleSetting } = useAppStore();
   const colors = settings.darkMode ? darkColors : lightColors;
-
+    const handleNamePress = () => {
+    const githubUrl = "https://github.com/kaushal-Prakash";
+    Linking.openURL(githubUrl);
+  };
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* 1. Header (Stays at the top) */}
@@ -135,9 +140,11 @@ export default function SettingsScreen() {
         <Text style={[styles.footerText, { color: colors.textSecondary }]}>
           {" "}by{" "}
         </Text>
-        <Text style={[styles.footerText, { fontWeight: "600", color: colors.text }]}>
-          Kaushal Prakash
-        </Text>
+        <TouchableOpacity onPress={handleNamePress}>
+          <Text style={[styles.footerText, { fontWeight: "600", color: colors.accent }]}>
+            Kaushal Prakash
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
