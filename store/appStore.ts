@@ -19,6 +19,7 @@ interface AppState {
   setActiveFile: (fileId: string | null) => void;
   updateFileContent: (fileId: string, newContent: string) => void;
   toggleSetting: (key: keyof AppSettings) => void;
+  addFile: (file: File) => void;
 }
 
 const initialFiles: File[] = [
@@ -64,6 +65,11 @@ export const useAppStore = create<AppState>((set, get) => ({
         ...state.settings,
         [key]: !state.settings[key],
       },
+    }));
+  },
+  addFile: (file) => {
+    set(state => ({
+      files: [file, ...state.files],
     }));
   },
 }));

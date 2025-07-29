@@ -1,24 +1,59 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useAppStore } from "../../store/appStore";
-import { darkColors, lightColors } from "../../constants/Colors";
+import React, { useEffect } from 'react'; // Import useEffect
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import * as Linking from 'expo-linking'; // Import Linking
+import * as FileSystem from 'expo-file-system'; // Import FileSystem
+import { useAppStore, File } from '../../store/appStore'; // Import File type
+import { darkColors, lightColors } from '../../constants/Colors';
 
 export default function ExplorerScreen() {
-  const { files, activeFile, setActiveFile, settings } = useAppStore();
+  const { files, activeFile, setActiveFile, settings, addFile } = useAppStore();
   const colors = settings.darkMode ? darkColors : lightColors;
+
+  useEffect(() => {
+    const handleIncomingFile = async (url: string) => {
+      if (!url) return;
+
+      try {
+        const content = await FileSystem.readAsStringAsync(url);
+        const filename = url.split('/').pop() || 'new-file.md';
+
+        const newFile: File = {
+          id: Date.now().toString(), 
+          name: decodeURIComponent(filename),
+          content: content,
+        };
+
+        addFile(newFile);
+        setActiveFile(newFile.id);
+
+        router.push('/(tabs)/editor');
+
+      } catch (e) {
+        console.error('Failed to read file:', e);
+      }
+    };
+
+    Linking.getInitialURL().then(url => {
+      if (url) {
+        handleIncomingFile(url);
+      }
+    });
+
+    const subscription = Linking.addEventListener('url', event => {
+      handleIncomingFile(event.url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
 
   const handleSelectFile = (fileId: string) => {
     setActiveFile(fileId);
-    router.push("/(tabs)/editor");
+    router.push('/(tabs)/editor');
   };
 
   return (
