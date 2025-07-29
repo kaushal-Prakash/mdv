@@ -1,10 +1,8 @@
-// app/(tabs)/_layout.tsx
-
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useAppStore } from '../../store/appStore';
-import { darkColors, lightColors } from '../../constants/Colors';
+import React from "react";
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useAppStore } from "../../store/appStore";
+import { darkColors, lightColors } from "../../constants/Colors";
 
 export default function TabLayout() {
   const { settings } = useAppStore();
@@ -25,14 +23,14 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '600',
+          fontWeight: "600",
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Explorer',
+          title: "Explorer",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="folder-open" size={size} color={color} />
           ),
@@ -41,7 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="editor"
         options={{
-          title: 'Editor',
+          title: "Editor",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="document-text" size={size} color={color} />
           ),
@@ -50,7 +48,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="preview"
         options={{
-          title: 'Preview',
+          title: "Preview",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="eye" size={size} color={color} />
           ),
@@ -59,7 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: "Settings",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           ),

@@ -1,6 +1,4 @@
-// store/appStore.ts
-
-import { create } from 'zustand';
+import { create } from "zustand";
 
 export interface File {
   id: string;
@@ -24,8 +22,17 @@ interface AppState {
 }
 
 const initialFiles: File[] = [
-  { id: '1', name: 'welcome.md', content: '# Welcome to MDV\n\nThis is a demo file. You can switch themes in the settings tab!' },
-  { id: '2', name: 'cheatsheet.md', content: '## Markdown Cheatsheet\n\n- **Bold**\n- *Italic*\n- `Code`' },
+  {
+    id: "1",
+    name: "welcome.md",
+    content:
+      "# Welcome to MDV\n\nThis is a demo file. You can switch themes in the settings tab!",
+  },
+  {
+    id: "2",
+    name: "cheatsheet.md",
+    content: "## Markdown Cheatsheet\n\n- **Bold**\n- *Italic*\n- `Code`",
+  },
 ];
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -37,17 +44,18 @@ export const useAppStore = create<AppState>((set, get) => ({
     wordWrap: true,
   },
   setActiveFile: (fileId) => {
-    const file = get().files.find(f => f.id === fileId) || null;
+    const file = get().files.find((f) => f.id === fileId) || null;
     set({ activeFile: file });
   },
   updateFileContent: (fileId, newContent) => {
-    set(state => ({
-      files: state.files.map(file =>
+    set((state) => ({
+      files: state.files.map((file) =>
         file.id === fileId ? { ...file, content: newContent } : file
       ),
-      activeFile: state.activeFile?.id === fileId
-        ? { ...state.activeFile, content: newContent }
-        : state.activeFile,
+      activeFile:
+        state.activeFile?.id === fileId
+          ? { ...state.activeFile, content: newContent }
+          : state.activeFile,
     }));
   },
   toggleSetting: (key) => {
