@@ -17,7 +17,32 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.kaushalprakash.mdv"
+      "package": "com.kaushalprakash.mdv",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "mimeType": "text/markdown"
+            },
+            {
+              "mimeType": "text/plain"
+            }
+          ],
+          "category": "DEFAULT"
+        },{
+          "action": "EDIT",
+          "data": [
+            {
+              "mimeType": "text/markdown"
+            },
+            {
+              "mimeType": "text/plain"
+            }
+          ],
+          "category": "DEFAULT"
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
