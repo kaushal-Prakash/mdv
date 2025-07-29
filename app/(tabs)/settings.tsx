@@ -1,24 +1,43 @@
+// app/(tabs)/settings.tsx
+
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  Switch,
-  ScrollView,
+  View, Text, StyleSheet, SafeAreaView, Switch, ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../constants/Colors';
 
-const colors = {
-  background: '#1e1e1e',
-  sidebar: '#252526',
-  titleBar: '#323233',
-  accent: '#007acc',
-  text: '#cccccc',
-  textSecondary: '#969696',
-  border: '#3e3e42',
-};
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+const SettingItem = ({
+  title,
+  description,
+  value,
+  onToggle,
+  icon,
+}: {
+  title: string;
+  description: string;
+  value: boolean;
+  onToggle: () => void;
+  icon: IoniconName;
+}) => (
+  <View style={styles.settingItem}>
+    <View style={styles.settingLeft}>
+      <Ionicons name={icon} size={20} color={colors.accent} />
+      <View style={styles.settingText}>
+        <Text style={styles.settingTitle}>{title}</Text>
+        <Text style={styles.settingDescription}>{description}</Text>
+      </View>
+    </View>
+    <Switch
+      value={value}
+      onValueChange={onToggle}
+      trackColor={{ false: colors.border, true: colors.accent + '40' }}
+      thumbColor={value ? colors.accent : colors.textSecondary}
+    />
+  </View>
+);
 
 export default function SettingsScreen() {
   const [settings, setSettings] = useState({
@@ -32,50 +51,19 @@ export default function SettingsScreen() {
   const toggleSetting = (key: keyof typeof settings) => {
     setSettings(prev => ({
       ...prev,
-      [key]: !prev[key]
+      [key]: !prev[key],
     }));
   };
 
-  const SettingItem = ({ 
-    title, 
-    description, 
-    value, 
-    onToggle, 
-    icon 
-  }: {
-    title: string;
-    description: string;
-    value: boolean;
-    onToggle: () => void;
-    icon: string;
-  }) => (
-    <View style={settingsStyles.settingItem}>
-      <View style={settingsStyles.settingLeft}>
-        <Ionicons name={icon as any} size={20} color={colors.accent} />
-        <View style={settingsStyles.settingText}>
-          <Text style={settingsStyles.settingTitle}>{title}</Text>
-          <Text style={settingsStyles.settingDescription}>{description}</Text>
-        </View>
-      </View>
-      <Switch
-        value={value}
-        onValueChange={onToggle}
-        trackColor={{ false: colors.border, true: colors.accent + '40' }}
-        thumbColor={value ? colors.accent : colors.textSecondary}
-      />
-    </View>
-  );
-
   return (
-    <SafeAreaView style={settingsStyles.container}>
-      <View style={settingsStyles.header}>
-        <Text style={settingsStyles.headerTitle}>SETTINGS</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>SETTINGS</Text>
       </View>
 
-      <ScrollView style={settingsStyles.content}>
-        <View style={settingsStyles.section}>
-          <Text style={settingsStyles.sectionTitle}>Appearance</Text>
-          
+      <ScrollView style={styles.content}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Appearance</Text>
           <SettingItem
             title="Dark Mode"
             description="Use dark theme for the interface"
@@ -83,7 +71,6 @@ export default function SettingsScreen() {
             onToggle={() => toggleSetting('darkMode')}
             icon="moon"
           />
-          
           <SettingItem
             title="Syntax Highlighting"
             description="Highlight markdown syntax in editor"
@@ -91,7 +78,6 @@ export default function SettingsScreen() {
             onToggle={() => toggleSetting('syntaxHighlighting')}
             icon="color-palette"
           />
-          
           <SettingItem
             title="Show Line Numbers"
             description="Display line numbers in editor"
@@ -101,9 +87,8 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <View style={settingsStyles.section}>
-          <Text style={settingsStyles.sectionTitle}>Editor</Text>
-          
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Editor</Text>
           <SettingItem
             title="Auto Save"
             description="Automatically save changes"
@@ -111,23 +96,21 @@ export default function SettingsScreen() {
             onToggle={() => toggleSetting('autoSave')}
             icon="save"
           />
-          
           <SettingItem
             title="Word Wrap"
             description="Wrap long lines in editor"
             value={settings.wordWrap}
             onToggle={() => toggleSetting('wordWrap')}
-            icon="wrap"
+            icon="swap-horizontal"
           />
         </View>
 
-        <View style={settingsStyles.section}>
-          <Text style={settingsStyles.sectionTitle}>About</Text>
-          
-          <View style={settingsStyles.aboutItem}>
-            <Text style={settingsStyles.aboutTitle}>MDV - Markdown Viewer</Text>
-            <Text style={settingsStyles.aboutVersion}>Version 1.0.0</Text>
-            <Text style={settingsStyles.aboutDescription}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>About</Text>
+          <View style={styles.aboutItem}>
+            <Text style={styles.aboutTitle}>MDV - Markdown Viewer</Text>
+            <Text style={styles.aboutVersion}>Version 1.0.0</Text>
+            <Text style={styles.aboutDescription}>
               A VS Code-inspired markdown viewer and editor for React Native
             </Text>
           </View>
@@ -137,7 +120,7 @@ export default function SettingsScreen() {
   );
 }
 
-const settingsStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,

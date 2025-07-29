@@ -1,52 +1,42 @@
+// store/fileStore.ts
+
 import { create } from 'zustand';
 
-interface FileItem {
+export interface File {
   id: string;
   name: string;
   content: string;
-  type: 'file' | 'folder';
-  children?: FileItem[];
 }
 
-interface FileStore {
-  files: FileItem[];
-  activeFile: FileItem | null;
-  setFiles: (files: FileItem[]) => void;
-  setActiveFile: (file: FileItem | null) => void;
-  updateFileContent: (id: string, content: string) => void;
-  addFile: (file: FileItem) => void;
+interface FileState {
+  files: File[];
+  activeFile: File | null;
+  setActiveFile: (fileId: string | null) => void;
+  updateFileContent: (fileId: string, newContent: string) => void;
 }
 
-export const useFileStore = create<FileStore>((set) => ({
-  files: [],
-  activeFile: null,
-  setFiles: (files) => set({ files }),
-  setActiveFile: (file) => set({ activeFile: file }),
-  updateFileContent: (id, content) =>
-    set((state) => {
-      const updateFile = (files: FileItem[]): FileItem[] =>
-        files.map((file) => {
-          if (file.id === id) {
-            return { ...file, content };
-          }
-          if (file.children) {
-            return { ...file, children: updateFile(file.children) };
-          }
-          return file;
-        });
+// Example initial data
+const initialFiles: File[] = [
+  { id: '1', name: 'welcome.md', content: '# Welcome to MDV\n\nThis is a demo file. Select another file or start editing!' },
+  { id: '2', name: 'cheatsheet.md', content: '## Markdown Cheatsheet\n\n- **Bold**\n- *Italic*\n- `Code`' },
+];
 
-      const updatedFiles = updateFile(state.files);
-      const updatedActiveFile = state.activeFile?.id === id 
-        ? { ...state.activeFile, content }
-        : state.activeFile;
-
-      return {
-        files: updatedFiles,
-        activeFile: updatedActiveFile,
-      };
-    }),
-  addFile: (file) =>
-    set((state) => ({
-      files: [...state.files, file],
-    })),
+export const useFileStore = create<FileState>((set, get) => ({
+  files: initialFiles,
+  activeFile: initialFiles[0] || null,
+  setActiveFile: (fileId) => {
+    const file = get().files.find(f => f.id === fileId) || null;
+    set({ activeFile: file });
+  },
+  updateFileContent: (fileId, newContent) => {
+    set(state => ({
+      files: state.files.map(file =>
+        file.id === fileId ? { ...file, content: newContent } : file
+      ),
+      // Also update activeFile if it's the one being edited
+      activeFile: state.activeFile?.id === fileId
+        ? { ...state.activeFile, content: newContent }
+        : state.activeFile,
+    }));
+  },
 }));
