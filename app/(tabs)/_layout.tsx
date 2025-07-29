@@ -3,9 +3,13 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../constants/Colors';
+import { useAppStore } from '../../store/appStore';
+import { darkColors, lightColors } from '../../constants/Colors';
 
 export default function TabLayout() {
+  const { settings } = useAppStore();
+  const colors = settings.darkMode ? darkColors : lightColors;
+
   return (
     <Tabs
       screenOptions={{

@@ -1,31 +1,25 @@
 // app/(tabs)/index.tsx
 
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useFileStore } from '../../store/fileStore';
-import { colors } from '../../constants/Colors';
 import { router } from 'expo-router';
+import { useAppStore } from '../../store/appStore';
+import { darkColors, lightColors } from '../../constants/Colors';
 
 export default function ExplorerScreen() {
-  const { files, activeFile, setActiveFile } = useFileStore();
+  const { files, activeFile, setActiveFile, settings } = useAppStore();
+  const colors = settings.darkMode ? darkColors : lightColors;
 
   const handleSelectFile = (fileId: string) => {
     setActiveFile(fileId);
-    router.push('/(tabs)/editor'); // Navigate to editor after selecting
+    router.push('/(tabs)/editor');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>EXPLORER</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.sidebar }}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>EXPLORER</Text>
       </View>
       <ScrollView>
         {files.map((file) => (
@@ -33,12 +27,13 @@ export default function ExplorerScreen() {
             key={file.id}
             style={[
               styles.fileItem,
-              activeFile?.id === file.id && styles.activeFileItem,
+              { borderBottomColor: colors.border },
+              activeFile?.id === file.id && { backgroundColor: colors.titleBar },
             ]}
             onPress={() => handleSelectFile(file.id)}
           >
             <Ionicons name="document-text-outline" size={20} color={colors.textSecondary} />
-            <Text style={styles.fileName}>{file.name}</Text>
+            <Text style={[styles.fileName, { color: colors.text }]}>{file.name}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -47,17 +42,11 @@ export default function ExplorerScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.sidebar,
-  },
   header: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   headerTitle: {
-    color: colors.text,
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 1,
@@ -68,13 +57,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  activeFileItem: {
-    backgroundColor: colors.titleBar,
   },
   fileName: {
-    color: colors.text,
     fontSize: 16,
     marginLeft: 15,
   },

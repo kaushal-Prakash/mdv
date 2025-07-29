@@ -1,4 +1,4 @@
-// store/fileStore.ts
+// store/appStore.ts
 
 import { create } from 'zustand';
 
@@ -8,22 +8,34 @@ export interface File {
   content: string;
 }
 
-interface FileState {
-  files: File[];
-  activeFile: File | null;
-  setActiveFile: (fileId: string | null) => void;
-  updateFileContent: (fileId: string, newContent: string) => void;
+export interface AppSettings {
+  darkMode: boolean;
+  autoSave: boolean;
+  wordWrap: boolean;
 }
 
-// Example initial data
+interface AppState {
+  files: File[];
+  activeFile: File | null;
+  settings: AppSettings;
+  setActiveFile: (fileId: string | null) => void;
+  updateFileContent: (fileId: string, newContent: string) => void;
+  toggleSetting: (key: keyof AppSettings) => void;
+}
+
 const initialFiles: File[] = [
-  { id: '1', name: 'welcome.md', content: '# Welcome to MDV\n\nThis is a demo file. Select another file or start editing!' },
+  { id: '1', name: 'welcome.md', content: '# Welcome to MDV\n\nThis is a demo file. You can switch themes in the settings tab!' },
   { id: '2', name: 'cheatsheet.md', content: '## Markdown Cheatsheet\n\n- **Bold**\n- *Italic*\n- `Code`' },
 ];
 
-export const useFileStore = create<FileState>((set, get) => ({
+export const useAppStore = create<AppState>((set, get) => ({
   files: initialFiles,
   activeFile: initialFiles[0] || null,
+  settings: {
+    darkMode: true,
+    autoSave: false,
+    wordWrap: true,
+  },
   setActiveFile: (fileId) => {
     const file = get().files.find(f => f.id === fileId) || null;
     set({ activeFile: file });
@@ -33,10 +45,17 @@ export const useFileStore = create<FileState>((set, get) => ({
       files: state.files.map(file =>
         file.id === fileId ? { ...file, content: newContent } : file
       ),
-      // Also update activeFile if it's the one being edited
       activeFile: state.activeFile?.id === fileId
         ? { ...state.activeFile, content: newContent }
         : state.activeFile,
+    }));
+  },
+  toggleSetting: (key) => {
+    set((state) => ({
+      settings: {
+        ...state.settings,
+        [key]: !state.settings[key],
+      },
     }));
   },
 }));

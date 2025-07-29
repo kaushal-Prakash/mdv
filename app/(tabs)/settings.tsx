@@ -1,33 +1,21 @@
 // app/(tabs)/settings.tsx
 
-import React, { useState } from 'react';
-import {
-  View, Text, StyleSheet, SafeAreaView, Switch, ScrollView,
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView, Switch, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../constants/Colors';
+import { useAppStore } from '../../store/appStore';
+import { darkColors, lightColors } from '../../constants/Colors';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+type Colors = typeof darkColors;
 
-const SettingItem = ({
-  title,
-  description,
-  value,
-  onToggle,
-  icon,
-}: {
-  title: string;
-  description: string;
-  value: boolean;
-  onToggle: () => void;
-  icon: IoniconName;
-}) => (
-  <View style={styles.settingItem}>
+const SettingItem = ({ title, description, value, onToggle, icon, colors }: { title: string, description: string, value: boolean, onToggle: () => void, icon: IoniconName, colors: Colors }) => (
+  <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
     <View style={styles.settingLeft}>
       <Ionicons name={icon} size={20} color={colors.accent} />
       <View style={styles.settingText}>
-        <Text style={styles.settingTitle}>{title}</Text>
-        <Text style={styles.settingDescription}>{description}</Text>
+        <Text style={[styles.settingTitle, { color: colors.text }]}>{title}</Text>
+        <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>{description}</Text>
       </View>
     </View>
     <Switch
@@ -35,82 +23,36 @@ const SettingItem = ({
       onValueChange={onToggle}
       trackColor={{ false: colors.border, true: colors.accent + '40' }}
       thumbColor={value ? colors.accent : colors.textSecondary}
+      ios_backgroundColor={colors.border}
     />
   </View>
 );
 
 export default function SettingsScreen() {
-  const [settings, setSettings] = useState({
-    darkMode: true,
-    autoSave: true,
-    syntaxHighlighting: true,
-    wordWrap: true,
-    showLineNumbers: false,
-  });
-
-  const toggleSetting = (key: keyof typeof settings) => {
-    setSettings(prev => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
+  const { settings, toggleSetting } = useAppStore();
+  const colors = settings.darkMode ? darkColors : lightColors;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>SETTINGS</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>SETTINGS</Text>
       </View>
-
-      <ScrollView style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Appearance</Text>
-          <SettingItem
-            title="Dark Mode"
-            description="Use dark theme for the interface"
-            value={settings.darkMode}
-            onToggle={() => toggleSetting('darkMode')}
-            icon="moon"
-          />
-          <SettingItem
-            title="Syntax Highlighting"
-            description="Highlight markdown syntax in editor"
-            value={settings.syntaxHighlighting}
-            onToggle={() => toggleSetting('syntaxHighlighting')}
-            icon="color-palette"
-          />
-          <SettingItem
-            title="Show Line Numbers"
-            description="Display line numbers in editor"
-            value={settings.showLineNumbers}
-            onToggle={() => toggleSetting('showLineNumbers')}
-            icon="list"
-          />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Appearance</Text>
+          <SettingItem title="Dark Mode" description="Use dark theme for the interface" value={settings.darkMode} onToggle={() => toggleSetting('darkMode')} icon="moon" colors={colors}/>
         </View>
-
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Editor</Text>
-          <SettingItem
-            title="Auto Save"
-            description="Automatically save changes"
-            value={settings.autoSave}
-            onToggle={() => toggleSetting('autoSave')}
-            icon="save"
-          />
-          <SettingItem
-            title="Word Wrap"
-            description="Wrap long lines in editor"
-            value={settings.wordWrap}
-            onToggle={() => toggleSetting('wordWrap')}
-            icon="swap-horizontal"
-          />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Editor</Text>
+          <SettingItem title="Auto Save" description="Automatically save on edit" value={settings.autoSave} onToggle={() => toggleSetting('autoSave')} icon="save" colors={colors} />
+          <SettingItem title="Word Wrap" description="Disable for horizontal scrolling" value={settings.wordWrap} onToggle={() => toggleSetting('wordWrap')} icon="swap-horizontal" colors={colors} />
         </View>
-
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
+          <Text style={[styles.sectionTitle, {color: colors.text}]}>About</Text>
           <View style={styles.aboutItem}>
-            <Text style={styles.aboutTitle}>MDV - Markdown Viewer</Text>
-            <Text style={styles.aboutVersion}>Version 1.0.0</Text>
-            <Text style={styles.aboutDescription}>
+            <Text style={[styles.aboutTitle, {color: colors.text}]}>MDV - Markdown Viewer</Text>
+            <Text style={[styles.aboutVersion, {color: colors.accent}]}>Version 1.0.0</Text>
+            <Text style={[styles.aboutDescription, {color: colors.textSecondary}]}>
               A VS Code-inspired markdown viewer and editor for React Native
             </Text>
           </View>
@@ -121,30 +63,23 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
+  content: {
+    paddingBottom: 40,
   },
   header: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   headerTitle: {
-    color: colors.text,
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 1,
-  },
-  content: {
-    flex: 1,
   },
   section: {
     marginTop: 30,
     paddingHorizontal: 20,
   },
   sectionTitle: {
-    color: colors.text,
     fontSize: 14,
     fontWeight: '600',
     letterSpacing: 0.5,
@@ -157,24 +92,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   settingLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginRight: 10,
   },
   settingText: {
     marginLeft: 15,
     flex: 1,
   },
   settingTitle: {
-    color: colors.text,
     fontSize: 16,
     fontWeight: '500',
   },
   settingDescription: {
-    color: colors.textSecondary,
     fontSize: 14,
     marginTop: 2,
   },
@@ -182,18 +115,15 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   aboutTitle: {
-    color: colors.text,
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 5,
   },
   aboutVersion: {
-    color: colors.accent,
     fontSize: 14,
     marginBottom: 10,
   },
   aboutDescription: {
-    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
